@@ -7,6 +7,16 @@ export const useAuth = () => {
   return context;
 };
 
+// ─────────────────────────────────────────
+// Format phone number to international format
+// Defaults to +91 (India) if no country code is given
+// ─────────────────────────────────────────
+const formatPhone = (raw) => {
+  const cleaned = raw.replace(/[\s-]/g, '');
+  if (cleaned.startsWith('+')) return cleaned;
+  return `+91${cleaned}`;
+};
+
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
@@ -60,8 +70,7 @@ const AuthProvider = ({ children }) => {
       if (identifier.includes('@')) {
         payload.email = identifier.trim();
       } else {
-        const cleaned = identifier.replace(/[\s-]/g, '');
-        payload.phone = cleaned.startsWith('+') ? cleaned : `+${cleaned}`;
+        payload.phone = formatPhone(identifier);
       }
       const res = await fetch(`${API_BASE}/auth/login`, {
         method: 'POST',
@@ -107,8 +116,7 @@ const AuthProvider = ({ children }) => {
       if (identifier.includes('@')) {
         payload.email = identifier.trim();
       } else {
-        const cleaned = identifier.replace(/[\s-]/g, '');
-        payload.phone = cleaned.startsWith('+') ? cleaned : `+${cleaned}`;
+        payload.phone = formatPhone(identifier);
       }
       const res = await fetch(`${API_BASE}/auth/signup`, {
         method: 'POST',
